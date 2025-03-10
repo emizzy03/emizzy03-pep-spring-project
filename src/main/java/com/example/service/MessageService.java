@@ -14,7 +14,7 @@ public class MessageService {
     private MessageRepository messageRepository;
     //create new messages
     public Message createMessage(Message message){
-        if(messageRepository.findByAccountId(message.getPostedBy()) != null){
+        if(messageRepository.findByPostedBy(message.getPostedBy()) != null){
             return messageRepository.save(message);
         }
         return null;
@@ -24,7 +24,7 @@ public class MessageService {
         return messageRepository.findAll();
     }
     //get message by id
-    public Optional<Message> findById(Long id){
+    public Optional<Message> findById(int id){
         return messageRepository.findById(id);
     }
     //get number of afftected deleted rows 
@@ -32,7 +32,7 @@ public class MessageService {
         return messageRepository.delMessage(id);
     }
     //get number of afffected updated rows
-    public int UpdateMessage(Long id, String message){
+    public int UpdateMessage(int id, String message){
         if(messageRepository.existsById(id) && message.length() >= 255){
             return messageRepository.UpdateMessage(id, message);
         }
@@ -40,7 +40,7 @@ public class MessageService {
     }
     //get all by accountid
     public List<Message>getAllMessages(int id){
-        return messageRepository.findByAccountId(id);
+        return messageRepository.findByPostedBy(id);
     }
 
 }

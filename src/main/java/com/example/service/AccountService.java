@@ -1,7 +1,7 @@
 package com.example.service;
 
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,16 +15,24 @@ public class AccountService {
 
     //Create accounts
     public Account insertAccount(Account account) {
-        if (!account.getUsername().trim().isEmpty() && account.getPassword().length() >= 4
-                && accountRepository.findByUsername(account.getUsername()) == null) {
-            return accountRepository.save(account);
+
+
+        if(account.getUsername().trim().isEmpty() && account.getPassword().length() < 4){
+            return null;
         }
-        return null;
+        return accountRepository.save(account);
     }
     //find accounts
-    public List<Account> login(String username, String password){
-       return accountRepository.findByUsernameAndPassword(username, password);
-       
+    public Account login(String username, String password){
+    List<Account> loginAccount = accountRepository.findByUsername(username);
+        for(Account num : loginAccount){
+            if(num.getUsername().equals(username) & num.getPassword().equals(password)){
+                return num;
+              }
+        }
+     
+
+      return null;
     }
 
 

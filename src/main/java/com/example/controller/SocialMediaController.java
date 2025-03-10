@@ -1,5 +1,22 @@
 package com.example.controller;
 
+import java.lang.StackWalker.Option;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.entity.Account;
+import com.example.repository.AccountRepository;
+import com.example.service.AccountService;
+import com.example.service.MessageService;
 
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller using Spring. The endpoints you will need can be
@@ -7,6 +24,38 @@ package com.example.controller;
  * where applicable as well as the @ResponseBody and @PathVariable annotations. You should
  * refer to prior mini-project labs and lecture materials for guidance on how a controller may be built.
  */
+@Controller
 public class SocialMediaController {
+    //@Autowired
+    //private MessageService messageService;
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private AccountService accountService;
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public ResponseEntity<Account> create_account(@RequestBody Account account){
+        List<Account> findUsername = accountRepository.findByUsername(account.getUsername().trim());
+        if(!findUsername.isEmpty()){
+            return ResponseEntity.status(409).body(account);
+        }
+        Account createAccount = accountService.insertAccount(account);
+        if(createAccount == null){
+            return ResponseEntity.status(400).body(account);
+        }
+      
+        return ResponseEntity.status(200).body(createAccount);
+        
+    }
+
+    @RequestMapping(value="/login", method=RequestMethod.POST)
+    public ResponseEntity<Account> loginAccount(@RequestBody Account account){
+        Account loginAccount = accountService.login(account.getUsername(), account.getPassword());
+
+       if(loginAccount ==null){
+        return ResponseEntity.status(401).body(loginAccount);
+       }
+       return ResponseEntity.status(200).body(loginAccount);
+    }
 
 }
