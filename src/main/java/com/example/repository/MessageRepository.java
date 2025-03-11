@@ -1,6 +1,7 @@
 package com.example.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,14 +14,15 @@ import com.example.entity.Message;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Integer>{
     List<Message> findByPostedBy (int id);
+   
 
-    @Modifying
-    @Query("DELETE FROM Message m WHERE m.messageId = :messageId")
-    int delMessage(@Param("messageId")int id);
+    // @Modifying
+    // @Query("DELETE FROM Message m WHERE m.messageId = :messageId")
+    // int delMessage(@Param("messageId")int messageId);
 
-    @Modifying
-    @Query("UPDATE Message m SET m.messageText = :messageText WHERE m.messageId = :messageId")
-    int UpdateMessage(@Param("messageId")int id, @Param("messageText")String messageText);
+    // @Modifying
+    // @Query("UPDATE Message m SET m.messageText = :messageText WHERE m.messageId = :messageId")
+    // int UpdateMessage(@Param("messageId")int id, @Param("messageText")String messageText);
 
 
 
