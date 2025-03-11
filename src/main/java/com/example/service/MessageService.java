@@ -1,6 +1,5 @@
 package com.example.service;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.entity.Message;
-import com.example.repository.AccountRepository;
 import com.example.repository.MessageRepository;
 
 @Service
