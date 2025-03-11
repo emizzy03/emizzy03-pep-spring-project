@@ -39,11 +39,8 @@ public class MessageService {
     // get number of afftected deleted rows
     public int delMessage(int id) {
     int count =0;
-     if(messageRepository.existsById(id)){
-        messageRepository.deleteById(id);
+     if(messageRepository.existsById(id) ){
         count++;
-     }else{
-        count = 0;
      }
      return count;
      
@@ -52,19 +49,25 @@ public class MessageService {
     }
 
     // get number of afffected updated rows
-    public int UpdateMessage(int id, String messageText) {
-
-        int count = 0;
-        if (messageRepository.existsById(id) && messageText.length() < 255 && !messageText.isEmpty()) {
-
-            count++;
-        }
-        return count;
+    public boolean UpdateMessage(int id, Message messageText) {
+        Optional<Message> t = messageRepository.findById(id);
+      
+       if(messageText.getMessageText().isBlank() || messageText.getMessageText() == "" || messageText.getMessageText().trim().length() == 0 || messageText.getMessageText().isEmpty()){
+        return false;
+        
+    }
+    else if(t.isPresent() && !messageText.getMessageText().trim().isEmpty() && messageText != null && messageText.getMessageText().length() <= 255){
+        t.get().setMessageText(messageText.getMessageText());
+        messageRepository.save(t.get());
+      return true;
+    }
+      
+        return false;
     }
 
-    // get all by accountid
-    public List<Message> getAllMessages(int accountId) {
-        return messageRepository.findByPostedBy(accountId);
-    }
+    //get all by accountid
+     public List<Message> getAllMessages(int accountId) {
+         return messageRepository.findByPostedBy(accountId);
+     }
 
 }

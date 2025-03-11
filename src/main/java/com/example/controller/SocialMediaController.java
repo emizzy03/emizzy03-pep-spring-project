@@ -3,12 +3,13 @@ package com.example.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.example.entity.Account;
 import com.example.entity.Message;
 import com.example.repository.AccountRepository;
@@ -25,8 +26,7 @@ import com.example.service.MessageService;
  * refer to prior mini-project labs and lecture materials for guidance on how a
  * controller may be built.
  */
-@RestController
-@RequestMapping("messages")
+@Controller
 public class SocialMediaController {
     @Autowired
     private MessageService messageService;
@@ -35,7 +35,7 @@ public class SocialMediaController {
     @Autowired
     private AccountService accountService;
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    @PostMapping("/register")
     public ResponseEntity<Account> create_account(@RequestBody Account account) {
         List<Account> findUsername = accountRepository.findByUsername(account.getUsername().trim());
         if (!findUsername.isEmpty()) {
@@ -50,7 +50,7 @@ public class SocialMediaController {
 
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @PostMapping("/login")
     public ResponseEntity<Account> loginAccount(@RequestBody Account account) {
         Account loginAccount = accountService.login(account.getUsername(), account.getPassword());
 
@@ -60,7 +60,7 @@ public class SocialMediaController {
         return ResponseEntity.status(200).body(loginAccount);
     }
 
-    @RequestMapping(value = "/messages", method = RequestMethod.POST)
+    @PostMapping("/messages")
     public ResponseEntity<Message> create_message(@RequestBody Message message) {
         Message creatMessage = messageService.createMessage(message);
         if (creatMessage == null) {
@@ -69,45 +69,47 @@ public class SocialMediaController {
         return ResponseEntity.status(200).body(creatMessage);
     }
 
-    @RequestMapping(value = "/messages", method = RequestMethod.GET)
+    @GetMapping("/messages")
     public ResponseEntity<List<Message>> getAllMessages() {
         return ResponseEntity.status(200).body(messageService.getAllMessages());
     }
 
-    @RequestMapping(value = "/{message_id}", method = RequestMethod.GET)
+    @GetMapping("/messages/{message_id}")
     public ResponseEntity<?> getMessageById(@PathVariable("message_id") int id) {
+        if(messageService.findMessageById(id).isEmpty()){
+            return ResponseEntity.status(200).body("");
+        }
         return ResponseEntity.status(200).body(messageService.findMessageById(id));
         
     }
 
 
-    @RequestMapping(value = "/{message_id}", method = RequestMethod.DELETE)
-    public ResponseEntity<String>deleteMessage(@PathVariable("message_id") int id){
+    @DeleteMapping("/messages/{message_id}")
+    public ResponseEntity<?>deleteMessage(@PathVariable("message_id") int id){
          int num = messageService.delMessage(id);
-         String word = String.valueOf(num);
-        if(messageService.delMessage(id) == 0){
+        if(num == 0){
         return ResponseEntity.status(200).body("");
     }
-    return ResponseEntity.status(200).body(word);
+    return ResponseEntity.status(200).body(num);
     }
     
 
-     @RequestMapping(value = "/{message_id}", method = RequestMethod.PATCH)
-     public ResponseEntity<String> updatedMessageById(@PathVariable("message_id") int id, @RequestBody String message) {
-       int c =messageService.UpdateMessage(id, message);
-       String word = String.valueOf(c);
+     @PatchMapping("/messages/{message_id}")
+     public ResponseEntity<?> updatedMessageById(@PathVariable("message_id") int id, @RequestBody Message message) {
+       boolean c =messageService.UpdateMessage(id, message);
 
-       if(c == 0){
-        return ResponseEntity.status(200).body("");
+       if(c== true){
+        return ResponseEntity.status(200).body(1);
 
        }
-       return ResponseEntity.status(200).body(word);
+       return ResponseEntity.status(400).body("");
      }
 
-    @RequestMapping(value = "/{account_id}", method = RequestMethod.GET)
-    public ResponseEntity<List<Message>> getMessageByAccountId(@PathVariable("account_id") int accountId) {
-        List<Message> message = messageService.getAllMessages(accountId);
-       return ResponseEntity.status(200).body(message);
+     
+     @GetMapping("/accounts/{account_id}/messages")
+     public ResponseEntity<List<Message>> getMessageByAccountId(@PathVariable("account_id") int accountId) {
+         List<Message> message = messageService.getAllMessages(accountId);
+        return ResponseEntity.status(200).body(message);
         
-    }
+     }
 }
